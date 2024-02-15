@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color-box Game</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f06060;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .box-big {
+            width: 520px;
+            height: 520px;
+            background-color: #d3d3d3;
+            margin: auto;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            border-radius: 10px;
+        }
+
+        .box {
+            width: 50%;
+            height: 50%;
+            background-color: aqua;
+            border: 5px solid #d3d3d3;
+            border-radius: 10px;
+        }
+
+        .welcome-screen {
+            display: block;
+        }
+
+        .game-screen {
+            display: none;
+        }
+
+        .pause-screen {
+            display: none;
+        }
+
+        .continue {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 遊戲首頁 -->
+    <div class="welcome-screen">
+        <h1>Color-box Game</h1>
+        <button class="start-Button">Start Game</button>
+    </div>
+
+    <!-- 遊戲進行頁 -->
+    <div class="game-screen">
+        <div>
+            <h1>Color-box Game</h1>
+            <p id="nowlevel">Level:</p>
+            <div id="Counter">Timer: <span id="demo-Counter"></span></div>
+        </div>
+        <div class="box-big"></div>
+        <button class="pause">Pause</button>
+        <button class="end">End Game</button>
+    </div>
+
+    <!-- 暫停頁 -->
+    <div class="pause-screen">
+        <h1>Color-box Game</h1>
+        <button class="continueYes">Continue Game</button>
+        <button class="end endYes">End Game</button>
+    </div>
+
+    <script>
+        let startButton = document.querySelector('.start-Button');
+        let pauseButton = document.querySelector('.pause');
+        let endButtons = document.querySelectorAll('.end');
+        let continueButton = document.querySelector('.continueYes');
+        let level = 2; //從level=2，不過是第一關開始遊戲
+        let size = 100 / level;
+        let boxBig = document.querySelector('.box-big');
+        let demoCounter = document.querySelector('#demo-Counter');
+        let counter = 15;
+
+
+        //按下Start button後進行的動作
+        startButton.addEventListener('click', function () {
+            demoCounter.innerHTML = '';
+            nowlevel.innerHTML = 2;
+            boxBig.innerHTML = '';
+            size = 50;
+            document.querySelector('.welcome-screen').style.display = 'none';
+            document.querySelector('.game-screen').style.display = 'block';
+            document.querySelector('.pause-screen').style.display = 'none';
+            counterInterval = setInterval(counterTimer, 1000);
+            game();
+        });
+        
+        //按下Pause button後進行的動作
+        pauseButton.addEventListener('click', function () {
+            document.querySelector('.pause-screen').style.display = 'block';
+            document.querySelector('.game-screen').style.display = 'none';
+            clearInterval(counterInterval);
+        });
+        
+        //按下End button後進行的動作
+        endButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                document.querySelector('.welcome-screen').style.display = 'block';
+                document.querySelector('.game-screen').style.display = 'none';
+                document.querySelector('.pause-screen').style.display = 'none';
+                clearInterval(counterInterval); 
+                alert('Game Over! Your final level was: ' + (level - 1));
+                level = 2; // 重置遊戲等級
+                counter = 15;//重設倒數計時器15秒
+            });
+        });
+        
+        //按下Continue button後進行的動作
+        continueButton.addEventListener('click', function () {
+            document.querySelector('.welcome-screen').style.display = 'none';
+            document.querySelector('.game-screen').style.display = 'block';
+            document.querySelector('.pause-screen').style.display = 'none';
+            counterInterval = setInterval(counterTimer, 1000);
+        });
+
+        //遊戲進行function
+        function game() {
+            boxBig.innerHTML = '';
+            let nowlevel = document.querySelector('#nowlevel');
+            nowlevel.innerHTML = 'Level: ' + (level - 1);
+
+            let color =
+                `rgb(${Math.floor(Math.random() * 255) + 1}, ${Math.floor(Math.random() * 255) + 1} ,${Math.floor(Math.random() * 255) + 1})`;
+
+            for (let i = 0; i < level ** 2; i++) {
+                boxBig.innerHTML +=
+                    `<div class="box" style="width:${size}%; height:${size}%; background-color:${color};"></div>`;
+            }
+
+            let randomAnswer = Math.floor(Math.random() * level ** 2) + 1;
+            let answerBox = document.querySelector(`.box-big .box:nth-of-type(${randomAnswer})`);
+            answerBox.classList.add("answer");
+            answerBox.style.opacity = `${0.5 + level * 0.005}`;
+
+            answerBox.addEventListener('click', function () {
+                level++;
+                size = 100 / level;
+                game();
+            });
+        }
+        
+        //倒數計時function
+        function counterTimer() {
+            if (counter >= 0) {
+                demoCounter.innerHTML = counter--;
+            } else {
+                clearInterval(counterInterval);
+                alert('Time\'s up! Game Over.'+'Your final level was: ' + (level - 1));
+                level = 2; //重設關卡level=2
+                counter = 15;//重設倒數計時器15秒
+                document.querySelector('.welcome-screen').style.display = 'block'; // 顯示歡迎頁面
+                document.querySelector('.game-screen').style.display = 'none'; // 隱藏遊戲進行頁
+            }
+        };
+
+    </script>
+</body>
+
+</html>
